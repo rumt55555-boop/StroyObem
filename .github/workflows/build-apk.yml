@@ -8,6 +8,8 @@ on:
       - '.github/workflows/build-apk.yml'
       - 'StroyObem_MVP_0.1_GitHub_APK_build.zip'
       - 'scripts/fix_android_runtime.py'
+      - 'scripts/offline_pdf.js'
+      - 'scripts/apply_offline_pdf.py'
 
 permissions:
   contents: read
@@ -46,6 +48,13 @@ jobs:
 
       - name: Patch Flutter dialog lifecycle
         run: python scripts/fix_android_runtime.py
+
+      - name: Add offline PDF rendering
+        run: |
+          python scripts/apply_offline_pdf.py
+          cp scripts/offline_pdf.js source/stroyobem/web/offline.js
+          curl --fail --location --retry 3 -o source/stroyobem/web/pdf.mjs https://cdn.jsdelivr.net/npm/pdfjs-dist@4.10.38/build/pdf.mjs
+          curl --fail --location --retry 3 -o source/stroyobem/web/pdf.worker.mjs https://cdn.jsdelivr.net/npm/pdfjs-dist@4.10.38/build/pdf.worker.mjs
 
       - name: Fix Flutter lint setup
         working-directory: source/stroyobem/android_client
