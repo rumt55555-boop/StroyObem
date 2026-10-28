@@ -7,6 +7,7 @@ on:
     paths:
       - '.github/workflows/build-apk.yml'
       - 'StroyObem_MVP_0.1_GitHub_APK_build.zip'
+      - 'scripts/fix_android_runtime.py'
 
 permissions:
   contents: read
@@ -43,11 +44,12 @@ jobs:
           channel: stable
           cache: true
 
+      - name: Patch Flutter dialog lifecycle
+        run: python scripts/fix_android_runtime.py
+
       - name: Fix Flutter lint setup
         working-directory: source/stroyobem/android_client
-        run: |
-          sed -i "/^import 'package:cross_file\/cross_file.dart';$/d" lib/main.dart
-          flutter pub add --dev flutter_lints
+        run: flutter pub add --dev flutter_lints
 
       - name: Test source and build APK
         working-directory: source/stroyobem
@@ -56,6 +58,8 @@ jobs:
           python -m unittest discover -s tests -v
           node --check web/app.js
           bash scripts/build_android.sh
+          cd android_client
+          flutter test test/dialog_lifecycle_test.dart
 
       - name: Verify APK
         run: test -s source/stroyobem/dist/StroyObem-MVP-0.1-debug.apk
