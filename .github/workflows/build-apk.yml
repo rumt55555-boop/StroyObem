@@ -10,6 +10,7 @@ on:
       - 'scripts/fix_android_runtime.py'
       - 'scripts/offline_pdf.js'
       - 'scripts/apply_offline_pdf.py'
+      - 'scripts/auto_detect.js'
 
 permissions:
   contents: read
@@ -53,6 +54,8 @@ jobs:
         run: |
           python scripts/apply_offline_pdf.py
           cp scripts/offline_pdf.js source/stroyobem/web/offline.js
+          cp scripts/auto_detect.js source/stroyobem/web/auto_detect.js
+          node --check scripts/auto_detect.js
           curl --fail --location --retry 3 -o source/stroyobem/web/pdf.mjs https://cdn.jsdelivr.net/npm/pdfjs-dist@4.10.38/build/pdf.mjs
           curl --fail --location --retry 3 -o source/stroyobem/web/pdf.worker.mjs https://cdn.jsdelivr.net/npm/pdfjs-dist@4.10.38/build/pdf.worker.mjs
 
