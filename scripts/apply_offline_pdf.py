@@ -30,7 +30,7 @@ s=s.replace(where,'''      if(path.startsWith('/local-pdf/')){
           await request.response.addStream(pickedPdf!.openRead());
         }
       }else if(path.startsWith('/api/')){''',1)
-s=s.replace("'/sw.js':'sw.js'}","'/sw.js':'sw.js','/pdf.mjs':'pdf.mjs','/pdf.worker.mjs':'pdf.worker.mjs','/offline.js':'offline.js'}",1)
+s=s.replace("'/sw.js':'sw.js'}","'/sw.js':'sw.js','/pdf.mjs':'pdf.mjs','/pdf.worker.mjs':'pdf.worker.mjs','/offline.js':'offline.js','/auto_detect.js':'auto_detect.js'}",1)
 s=s.replace("file.endsWith('.js')?'application/javascript':","(file.endsWith('.js')||file.endsWith('.mjs'))?'application/javascript':",1)
 d.write_text(s)
 j=r/'web/app.js';a=j.read_text()
@@ -43,6 +43,6 @@ a=a.replace("$('#confirm').onclick=guard(async()=>{project=await api", "$('#conf
 a=a.replace("$('#upload').onchange=guard(async ev=>{","$('#upload').onchange=guard(async ev=>{",1)
 a=a.replace("async function download(final){if(dirty)","async function download(final){if(project?.offline)throw Error('XLSX требует подключения к серверу. Экспортируйте копию данных проекта в JSON.');if(dirty)",1)
 j.write_text(a)
-h=r/'web/index.html';html=h.read_text();html=html.replace('<script src="/app.js"></script>','<script src="/app.js"></script><script src="/offline.js"></script>');h.write_text(html)
-b=r/'scripts/build_android.sh';build=b.read_text();build=build.replace(' assets/ui/\npython3',' assets/ui/\ncp "$ROOT/web/offline.js" "$ROOT/web/pdf.mjs" "$ROOT/web/pdf.worker.mjs" assets/ui/\npython3',1);b.write_text(build)
+h=r/'web/index.html';html=h.read_text();html=html.replace('<script src="/app.js"></script>','<script src="/app.js"></script><script src="/offline.js"></script><script src="/auto_detect.js"></script>');h.write_text(html)
+b=r/'scripts/build_android.sh';build=b.read_text();build=build.replace(' assets/ui/\npython3',' assets/ui/\ncp "$ROOT/web/offline.js" "$ROOT/web/auto_detect.js" "$ROOT/web/pdf.mjs" "$ROOT/web/pdf.worker.mjs" assets/ui/\npython3',1);b.write_text(build)
 print('Offline PDF integration installed')
