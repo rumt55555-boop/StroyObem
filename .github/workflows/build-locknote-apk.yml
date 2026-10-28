@@ -1,4 +1,4 @@
-name: Build LockNote v7 APK
+name: Build LockNote v8 APK
 on:
   workflow_dispatch:
   push:
@@ -22,24 +22,19 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-
       - name: Java 17
         uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: '17'
-
       - name: Restore Gradle cache
         uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: '8.11.1'
-
       - name: Extract project sources
         run: base64 -d sources.tar.bz2.base64 | tar -xj
-
       - name: Verify project resources
         run: python3 scripts/check_project.py
-
       - name: Use preinstalled Android SDK
         shell: bash
         run: |
@@ -59,13 +54,11 @@ jobs:
           else
             echo "Android SDK already available"
           fi
-
       - name: Tests and APK in one Gradle invocation
         run: gradle --no-daemon --build-cache testDebugUnitTest assembleDebug
-
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: LockNote-v7-APK
+          name: LockNote-v8-APK
           path: LockNote/app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error
