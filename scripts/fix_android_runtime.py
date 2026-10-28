@@ -9,7 +9,7 @@ a = s.index(start_marker)
 b = s.index(end_marker, a)
 s = s[:a] + """          final result=await showDialog<String>(
             context:context,
-            builder:(_)=>TextEntryDialog(title:r.message, initialValue:r.defaultText),
+            builder:(_)=>TextEntryDialog(title:r.message, initialValue:r.defaultText??''),
           );
           return result??'';
 """ + s[b:]
@@ -110,4 +110,10 @@ void main() {
   });
 }
 """, encoding='utf-8')
+pubspec = Path('source/stroyobem/android_client/pubspec.yaml')
+pub = pubspec.read_text(encoding='utf-8')
+if 'flutter_test:' not in pub:
+    assert 'flutter:\n  uses-material-design:' in pub, 'Unexpected Flutter pubspec structure'
+    pub = pub.replace('flutter:\n  uses-material-design:', 'dev_dependencies:\n  flutter_test:\n    sdk: flutter\nflutter:\n  uses-material-design:', 1)
+    pubspec.write_text(pub, encoding='utf-8')
 print('Android runtime source patched; lifecycle test added.')
