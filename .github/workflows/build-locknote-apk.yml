@@ -1,0 +1,42 @@
+name: Build LockNote v5 APK
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'LockNote/**'
+      - '.github/workflows/build-locknote-apk.yml'
+jobs:
+  build-locknote:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    defaults:
+      run:
+        working-directory: LockNote
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: android-actions/setup-android@v3
+      - name: Install Android SDK 35
+        run: sdkmanager "platforms;android-35" "build-tools;35.0.0"
+      - name: Extract project sources
+        run: base64 -d sources.tar.bz2.base64 | tar -xj
+      - name: Verify resources
+        run: python3 scripts/check_project.py
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.11.1'
+      - name: Run unit tests
+        run: gradle --no-daemon testDebugUnitTest
+      - name: Build debug APK
+        run: gradle --no-daemon assembleDebug
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: LockNote-v5-APK
+          path: LockNote/app/build/outputs/apk/debug/app-debug.apk
+          if-no-files-found: error
